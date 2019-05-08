@@ -1,8 +1,10 @@
-﻿using System.Security.Claims;
+﻿using System.Data.Entity;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
+using WebAPICustomers.Models.Domain;
 
 namespace WebAPICustomers.Models
 {
@@ -24,6 +26,8 @@ namespace WebAPICustomers.Models
             : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
+
+        public DbSet<Customer> Customers { get; set; }
         
         public static ApplicationDbContext Create()
         {
