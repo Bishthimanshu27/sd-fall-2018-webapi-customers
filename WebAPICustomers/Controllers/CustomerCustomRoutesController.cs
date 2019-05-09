@@ -27,7 +27,7 @@ namespace WebAPICustomers.Controllers
         }
 
         [HttpGet]
-        [Route("get-by-id/{id:int}")]
+        [Route("get-by-id/{id:int}", Name = "GetCustomerById")]
         public IHttpActionResult GetById(int id)
         {
             var customer = Context
@@ -57,16 +57,34 @@ namespace WebAPICustomers.Controllers
 
         [HttpPost]
         [Route("create")]
-        public IHttpActionResult Create(Customer customer)
+        public IHttpActionResult Create(CustomerBindingModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var customer = new Customer();
+            customer.FirstName = model.FirstName;
+            customer.LastName = model.LastName;
+            customer.Email = model.Email;
+            customer.PhoneNumber = model.PhoneNumber;
+
             Context.Customers.Add(customer);
             Context.SaveChanges();
 
-            var url = Url.Link("DefaultApi",
-                new { Controller = "CustomerCustomRoutes", Action = "Create", Id = customer.Id });
+            var url = Url.Link("GetCustomerById",
+                new { Id = customer.Id });
 
             //return Ok();
-            return Created(url, customer);
+            var customerModel = new CustomerViewModel();
+            customerModel.Id = customer.Id;
+            customerModel.FirstName = customer.FirstName;
+            customerModel.LastName = customer.LastName;
+            customerModel.PhoneNumber = customer.PhoneNumber;
+            customerModel.Email = customer.Email;
+
+            return Created(url, customerModel);
         }
 
         [HttpPut]

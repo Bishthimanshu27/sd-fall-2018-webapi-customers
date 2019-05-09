@@ -1,4 +1,7 @@
-﻿using System;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,6 +13,7 @@ using WebAPICustomers.Models.Domain;
 namespace WebAPICustomers.Controllers
 {
     [RoutePrefix("api/customer")]
+    [Authorize]
     public class CustomerController : ApiController
     {
         private ApplicationDbContext Context;
@@ -19,9 +23,17 @@ namespace WebAPICustomers.Controllers
             Context = new ApplicationDbContext();
         }
 
+        [Authorize(Roles = "Admin")]
         public IHttpActionResult Get()
         {
-            return Ok(Context.Customers.ToList());
+            var userId = User.Identity.GetUserId();
+
+            var model = Context
+                .Customers
+                .ProjectTo<CustomerViewModel>()
+                .ToList();
+
+            return Ok(model);
         }
 
         [Route("{id:int}")]
@@ -29,6 +41,7 @@ namespace WebAPICustomers.Controllers
         {
             var customer = Context
                 .Customers
+                .ProjectTo<CustomerViewModel>()
                 .FirstOrDefault(p => p.Id == id);
 
             if (customer == null)
@@ -46,13 +59,21 @@ namespace WebAPICustomers.Controllers
                 .Customers
                 .Where(p => p.FirstName.Contains(search) ||
                 p.LastName.Contains(search))
+                .ProjectTo<CustomerViewModel>()
                 .ToList();
 
             return Ok(customers);
         }
 
-        public IHttpActionResult Post(Customer customer)
+        public IHttpActionResult Post(CustomerBindingModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var customer = Mapper.Map<Customer>(model);
+            
             Context.Customers.Add(customer);
             Context.SaveChanges();
 
@@ -60,11 +81,20 @@ namespace WebAPICustomers.Controllers
                 new { Controller = "Customer", Id = customer.Id });
 
             //return Ok();
-            return Created(url, customer);
+
+            var customerModel = Mapper.Map<CustomerViewModel>(customer);
+
+            return Created(url, customerModel);
         }
 
-        public IHttpActionResult Put(int id, Customer formData)
+        [Route("{id}")]
+        public IHttpActionResult Put(int id, CustomerBindingModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var customer = Context.Customers.FirstOrDefault(p => p.Id == id);
 
             if (customer == null)
@@ -72,14 +102,13 @@ namespace WebAPICustomers.Controllers
                 return NotFound();
             }
 
-            customer.FirstName = formData.FirstName;
-            customer.LastName = formData.LastName;
-            customer.Email = formData.Email;
-            customer.PhoneNumber = formData.PhoneNumber;
+            Mapper.Map(model, customer);
 
             Context.SaveChanges();
 
-            return Ok(customer);
+            var customerModel = Mapper.Map<CustomerViewModel>(customer);
+
+            return Ok(customerModel);
         }
 
         public IHttpActionResult Delete(int id)
