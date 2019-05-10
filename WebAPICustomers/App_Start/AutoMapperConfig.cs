@@ -13,8 +13,10 @@ namespace WebAPICustomers.App_Start
         public static void Init()
         {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<Customer, CustomerViewModel>();
-                cfg.CreateMap<CustomerBindingModel, Customer>();
+                cfg.CreateMap<Customer, CustomerViewModel>().ReverseMap();
+                cfg.CreateMap<Customer, CustomerBindingModel>().ReverseMap();
+                cfg.CreateMap<Order, OrderBindingModel>().ReverseMap();
+                cfg.CreateMap<Order, OrderViewModel>().ReverseMap();
             });
         }
     }
