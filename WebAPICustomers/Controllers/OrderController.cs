@@ -16,12 +16,16 @@ namespace WebAPICustomers.Controllers
     public class OrderController : ApiController
     {
         private ApplicationDbContext Context { get; set; }
-
+        
         public OrderController()
-        {
+        {  
             Context = new ApplicationDbContext();
         }
 
+        /// <summary>
+        /// Returns all orders in the system
+        /// </summary>
+        /// <returns>Returns a list of orders</returns>
         [HttpGet]
         [Route("get-all")]
         public IHttpActionResult GetAll()
@@ -34,6 +38,11 @@ namespace WebAPICustomers.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Get an order by ID
+        /// </summary>
+        /// <param name="id">The id of the order</param>
+        /// <returns>The order</returns>
         [HttpGet]
         [Route("get-by-id/{id:int}", Name = "GetOrderById")]
         public IHttpActionResult GetById(int id)

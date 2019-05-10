@@ -6,8 +6,14 @@ using System.Web;
 
 namespace WebAPICustomers.Models
 {
+    /// <summary>
+    /// This is class is used to receive paramters to create customers
+    /// </summary>
     public class CustomerBindingModel
     {
+        /// <summary>
+        /// This is the first name of the Customer.
+        /// </summary>
         [Required]
         public string FirstName { get; set; }
 
