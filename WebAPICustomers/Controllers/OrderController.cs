@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Results;
 using WebAPICustomers.Models;
 using WebAPICustomers.Models.Domain;
 
@@ -28,6 +30,7 @@ namespace WebAPICustomers.Controllers
         /// <returns>Returns a list of orders</returns>
         [HttpGet]
         [Route("get-all")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<OrderViewModel>))]
         public IHttpActionResult GetAll()
         {
             var model = Context
@@ -60,14 +63,11 @@ namespace WebAPICustomers.Controllers
             return Ok(model);
         }
 
-        public class ErroResult
-        {
-            public string Property { get; set; }
-            public string ErrorMessage { get; set; }
-        }
+        
 
         [HttpPost]
         [Route("create")]
+        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrderViewModel))]
         public IHttpActionResult Create(OrderBindingModel model)
         {
             if (!ModelState.IsValid)
@@ -82,11 +82,16 @@ namespace WebAPICustomers.Controllers
             if (!customerExist)
             {
                 ModelState.AddModelError("CustomerId", "Invalid customer ID");
-                //var error = new ErroResult();
+                return BadRequest(ModelState);
+
+                //var error = new ErrorResult();
                 //error.Property = "CustomerId";
                 //error.ErrorMessage = "Invalid customer ID";
-                //return BadRequest(error);
-                return BadRequest(ModelState);
+
+                //var response = Request.CreateResponse(
+                //        HttpStatusCode.BadRequest, error);
+
+                //return ResponseMessage(response);
             }
 
             var order = Mapper.Map<Order>(model);

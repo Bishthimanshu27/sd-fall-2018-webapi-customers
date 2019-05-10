@@ -35,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\WebAPICustomers.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -242,6 +243,7 @@
     <Compile Include="Models\CustomerViewModel.cs" />
     <Compile Include="Models\Domain\Customer.cs" />
     <Compile Include="Models\Domain\Order.cs" />
+    <Compile Include="Models\ErrorResult.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\OrderBindingModel.cs" />
     <Compile Include="Models\OrderViewModel.cs" />
